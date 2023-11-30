@@ -1,0 +1,14 @@
+{
+    "appPath": "../../../../apps/quakes/childapps/quakesmap/app.mjs",
+    "basePath": "../../../../",
+    "environment": "development",
+    "mainPath": "../../node_modules/neo.mjs/src/Main.mjs",
+    "mainThreadAddons": [
+        "GoogleMaps",
+        "Stylesheet"
+    ],
+    "themes"          : ["neo-theme-light"],
+    "useSharedWorkers": true,
+    "googleMapsApiKey": "AIzaSyCRj-EPE3H7PCzZtYCmDzln6sj7uPCGohA",
+    "workerBasePath": "../../../../node_modules/neo.mjs/src/worker/"
+}

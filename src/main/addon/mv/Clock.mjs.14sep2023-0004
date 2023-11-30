@@ -1,0 +1,81 @@
+import Base       from '../../core/Base.mjs';
+import DomAccess  from '../DomAccess.mjs';
+import DomEvents  from '../DomEvents.mjs';
+import Observable from '../../core/Observable.mjs';
+
+class Clock extends Base {
+    static config = {
+        className: 'Neo.main.addon.Clock',
+        mixins: [Observable],
+        clockRunId: null,
+        remote: {
+            app: [
+                'create',
+                'tick',
+                'start',
+                'stop'
+            ]
+        },
+        singleton: true
+    }
+
+    construct(config) {
+        super.construct(config);
+        console.log(`${this.secondsStamp()} TIMER: addon/Clock.construct`);
+    }
+
+    create(opts) {
+        
+        let me = this,
+        //appName = opts.appName,
+        //id = opts.id.
+        
+        //let chartElement = DomAccess.getElement(id);
+        //timeval = me.showClock();
+        return me.timeTick();
+        
+        //console.log(`addon/Clock.mjs appName: ${appName} create chartElement`, chartElement);
+        //console.log(`addon/Clock.mjs appName: ${appName} create opts.id `, );        
+        //chartElement.innerHTML = timeval;  // works ... errors
+        //chartElement.innerText = timeval;  // works
+    }
+
+    start() {
+        if (this.clockRunId === null ) {
+            console.log(`addon/Clock.mjs start() START [not running clockRunId is null: ${clockRunId}]`);
+            this.clockRunId = setInterval(this.tick, 1000);
+        else {
+           console.log(`addon/Clock.mjs start() NO-OP [already running clockRunId is: ${clockRunId}]` );
+    }
+
+    stop() {
+        if (this.clockRunId === null ) {
+            console.log(`addon/Clock.mjs stop() NO-OP [not running clockRunId is null: ${clockRunId}]`);
+        else {
+            console.log(`addon/Clock.mjs stop() STOP  [running clockRunId is: ${clockRunId}]` );
+            clearInterval( this.clockRunId );
+            this.clockRunId = null;
+    }
+
+    tick() {
+
+       const intlTime = new Intl.DateTimeFormat([], {
+           hour: "2-digit",
+           minute: "2-digit",
+           second: "2-digit",
+           //fractionalSecondDigits: 1
+       });
+
+       return intlTime.format(new Date());
+    }
+
+    secondsStamp(){
+        let date = new Date() ;
+        return `${date.getUTCSeconds()}:${date.getUTCMilliseconds()}`;
+    }
+
+
+}
+
+Neo.applyClassConfig(Clock);
+export default Clock;

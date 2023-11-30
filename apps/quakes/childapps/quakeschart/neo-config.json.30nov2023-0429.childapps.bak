@@ -1,0 +1,13 @@
+{
+    "appPath": "../../../../apps/quakes/childapps/quakeschart/app.mjs",
+    "basePath": "../../../../",
+    "environment": "development",
+    "mainPath": "../../node_modules/neo.mjs/src/Main.mjs",
+    "mainThreadAddons": [
+        "PlotlyChart",
+        "Stylesheet"
+    ],
+    "themes"          : ["neo-theme-light"],
+    "useSharedWorkers": true,
+    "workerBasePath": "../../../../node_modules/neo.mjs/src/worker/"
+}

@@ -1,0 +1,172 @@
+import ComponentBase  from '../../../node_modules/neo.mjs/src/component/Base.mjs';
+import VDomUtil       from '../../../node_modules/neo.mjs/src/util/Vdom.mjs';
+
+
+class PlotlyComponent extends ComponentBase {
+    static config = {
+        className: "quakes.view.PlotlyComponent",
+        ntype: 'plotly-component',
+        reference: 'plotly-component-ref',
+        chartData_: null,
+        chartLayout_: null,
+        dataPath: '',
+        _vdom: {
+            cn: [{
+                tag: 'div',
+                id: 'gd',
+                //innerHTML: 'here be plotly component',
+                flag: 'chart-gd',
+            }]
+        }
+    }
+
+    construct(config) {
+        super.construct(config);
+
+        let me = this;
+
+
+        me.addDomListeners({
+            'click'               : me.parseClick,
+            'dblclick'               : me.parseDblClick,
+            //'plotly_click'        : me.parsePlotlyClick,
+            //'plotly_contextmenu'  : me.parsePlotlyContextmenu,
+            //'plotly_doubleclick'  : me.parsePlotlyDoubleclick,
+            'contextmenu'           : me.parsePlotlyNoDefaultContextmenu,
+            local                 : false,
+            scope                 : me
+        });
+
+    }
+
+    //async afterSetMounted(value, oldValue) {
+    afterSetMounted(value, oldValue) {
+
+        super.afterSetMounted(value, oldValue);
+        if (!value) return;
+
+        let me = this;
+        let chart, chartdiv, plotconf;
+
+        let vdom = me.vdom;
+        //chartdiv = vdom.id;
+         chartdiv = 'gd';
+
+        let vdomChartGd = VDomUtil.getByFlag(vdom, 'chart-gd');
+
+        //const model = this.getModel();
+        //plotconf = model.data.plotconf;
+
+        plotconf = {
+             appName: me.appName,
+             layout: { "width": 500, "height": 400},
+             data:  [{ "y": [0, 3, 1, 4] }]
+        };
+
+        plotconf.chartdiv = chartdiv;
+
+        /**
+        await Neo.main.addon.PlotlyChart.newPlot(plotconf).
+           then(res => {console.log('PlotlyComponent.mjs PlotlyChart.newPlot res: ',res);
+              return res}).
+           catch(err => console.log('PlotlyComponent.mjs PlotlyChart.newPlot  err: ',err));
+
+        //vdomChartGd.innerHTML = 'would be chart';
+        **/
+
+
+        setTimeout(() => {
+            chart =  Neo.main.addon.PlotlyChart.newPlot(plotconf).
+                catch(err => console.log('PlotlyChartWrapper newPlot err: ',err));
+        }, 0);
+
+
+        /**       
+        chart =  Neo.main.addon.PlotlyChart.newPlot(plotconf).
+                catch(err => console.log('PlotlyChartWrapper newPlot err: ',err));
+       **/
+     
+        vdomChartGd.innerHTML = chart;
+        me.vdom = vdom
+
+
+        function plotlyChartClickListener(e){
+          console.log('plotlyChartClickListener plotly_chart_click event:', e);
+          let plotXYZ = e.plotXYZ;
+          console.log(`plot x,y ${plotXYZ.x}, ${plotXYZ.y}`);
+        };
+    }
+
+    parseClick(data) {
+        console.log('PlotlyComponent  parseClick data:',data);
+        let me = this;
+
+        /**
+        me.fire('plotlyclickClick', {
+            id: me.id,
+            data
+        })
+        **/
+    }
+
+    parseDblClick(data) {
+        console.log('PlotlyComponent  parseDblClick data:',data);
+        let me = this;
+
+        /**
+        me.fire('plotlyDblClick', {
+            id: me.id,
+            data
+        })
+        **/
+    }
+
+
+    parsePlotlyClick(data) {
+        console.log('PlotlyComponent parsePlotlyClick data:',data);
+        let me = this;
+
+        /**
+        me.fire('plotlyClick', {
+            id: me.id,
+            data
+        })
+        **/
+    }
+
+    parsePlotlyNoDefaultContextmenu(data) {
+       data.preventDefault();
+       console.log('PlotlyComponent parsePlotlyNoDefaultContextmenu data:',data);
+    }
+
+    parsePlotlyContextmenu(data) {
+        console.log('PlotlyComponent parsePlotlyContextmenu data:',data);
+        let me = this;
+
+        /**
+        me.fire('plotlyCcontextmenu', {
+            id: me.id,
+            data
+        })
+        **/
+    }
+
+    parsePlotlyDoubleclick(data) {
+        console.log('PlotlyComponent parsePlotlyDoubleclick data:',data);
+        let me = this;
+
+        /**
+        me.fire('plotlyDoubleclick', {
+            id: me.id,
+            data
+        })
+        **/
+    }
+
+
+
+}
+
+Neo.applyClassConfig(PlotlyComponent);
+
+export default PlotlyComponent;

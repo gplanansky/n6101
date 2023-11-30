@@ -1,0 +1,78 @@
+import Base from '../../core/Base.mjs';
+
+/**
+ * Basic CRUD support for Chrome File System Access API
+ * @class Neo.main.addon.FileSystemAccess
+ * @extends Neo.core.Base
+ * @singleton
+ */
+class FileSystemAccess extends Base {
+    static config = {
+        /**
+         * @member {String} className='Neo.main.addon.FileSystemAccess'
+         * @protected
+         */
+        className: 'Neo.main.addon.FileSystemAccess',
+        /**
+         * Remote method access for other workers
+         * @member {Object} remote={app: [//...]}
+         * @protected
+         */
+        remote: {
+            app: [
+                'readBrowserDate',
+                'readBrowserVendor',
+                'readNavigatorLanguage',
+                'openFilePicker',
+                'saveFilePicker',
+                'directoryPicker',
+            ]
+        },
+        /**
+         * @member {Boolean} singleton=true
+         * @protected
+         */
+        singleton: true
+    }
+
+    /**
+    **/
+
+    readNavigatorLanguage(){
+       return window.navigator.language
+    }
+
+    /**
+     * test remote method using simple window function
+     * (the date is available directly via js Date() )
+     **/
+    readBrowserDate() {
+       return window.Date();
+    }
+
+    /**
+     * test using simple window value
+     * (Neo app has access to many such, but not vendor,
+     * via self.navigator.origin etc)
+     **/
+    readBrowserVendor() {
+       return window.navigator.vendor;
+    }
+    
+    openFilePicker(opts) {
+       return window.showOpenFilePicker(opts);
+    }
+    
+    saveFilePicker(opts) {
+       return window.showSaveFilePicker(opts);
+    }
+
+    directoryPicker(optd) {
+       return window.showDirectoryPicker(opts);
+    }
+
+}
+
+let instance = Neo.applyClassConfig(FileSystemAccess);
+
+export default instance;

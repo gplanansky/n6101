@@ -1,0 +1,151 @@
+import ComponentBase  from '../../../node_modules/neo.mjs/src/component/Base.mjs';
+
+class PlotlyComponent extends ComponentBase {
+    static config = {
+        className: "Quakes.view.PlotlyComponent",
+        ntype: 'plotly-component',
+        chartData_: null,
+        //chartData_:  [{ "y": [3, 2, 3] }],
+        /**
+         * @member {Object} chartLayout_=null
+         */
+        chartLayout_: null,
+        //chartLayout_:  { "width": 500, "height": 400},
+        /**
+         *@member {string} dataPath=''
+         **/
+        dataPath: '',
+    }
+
+    construct(config) {
+        super.construct(config);
+
+        let me = this;
+
+
+        me.addDomListeners({
+            'click'               : me.parseClick,
+            'contextmenu'           : me.parsePlotlyNoDefaultContextmenu,
+            'dblclick'               : me.parseDblClick,
+            //'plotly_click'        : me.parsePlotlyClick,
+            //'plotly_contextmenu'  : me.parsePlotlyContextmenu,
+            //'plotly_doubleclick'  : me.parsePlotlyDoubleclick,
+            'contextmenu'           : me.parsePlotlyNoDefaultContextmenu,
+            local                 : false,
+            scope                 : me
+        });
+
+    }
+
+    async afterSetMounted(value, oldValue) {
+
+        super.afterSetMounted(value, oldValue);
+        if (!value) return;
+
+        let me = this;
+        let chart, chartdiv, plotconf;
+
+        //const model = this.getModel();
+        //plotconf = model.data.plotconf;
+
+        /**
+        plotconf = {
+             layout:  me.chartLayout, //  layout: { "width": 500, "height": 400},
+             data:  me.chartData      //  data:  [{ "y": [0, 3, 1, 4] }]
+        };
+        **/
+
+        plotconf = {
+             appName: me.appName,
+             layout:  { "width": 500, "height": 400},
+             data:   [{ "y": [0, 3, 1, 4] }]
+        };
+        
+        chartdiv = me.id;
+        plotconf.chartdiv = chartdiv;
+        
+        await Neo.main.addon.PlotlyChart.newPlot(plotconf).
+           then(res => {console.log('PlotlyComponent.mjs PlotlyChart.newPlot res: ',res);
+              return res}).
+           catch(err => console.log('PlotlyComponent.mjs PlotlyChart.newPlot  err: ',err));
+        
+        function plotlyChartClickListener(e){
+          console.log('plotlyChartClickListener plotly_chart_click event:', e);
+          let plotXYZ = e.plotXYZ;
+          console.log(`plot x,y ${plotXYZ.x}, ${plotXYZ.y}`);
+        };
+    }
+
+    parseClick(data) {
+        console.log('PlotlyComponent  parseClick data:',data);
+        let me = this;
+
+        /**
+        me.fire('plotlyclickClick', {
+            id: me.id,
+            data
+        })
+        **/
+    }
+
+    parseDblClick(data) {
+        console.log('PlotlyComponent  parseDblClick data:',data);
+        let me = this;
+
+        /**
+        me.fire('plotlyDblClick', {
+            id: me.id,
+            data
+        })
+        **/
+    }
+
+
+    parsePlotlyClick(data) {
+        console.log('PlotlyComponent parsePlotlyClick data:',data);
+        let me = this;
+
+        /**
+        me.fire('plotlyClick', {
+            id: me.id,
+            data
+        })
+        **/
+    }
+
+    parsePlotlyNoDefaultContextmenu(data) {
+       data.preventDefault();
+       console.log('PlotlyComponent parsePlotlyNoDefaultContextmenu data:',data);
+    }
+
+    parsePlotlyContextmenu(data) {
+        console.log('PlotlyComponent parsePlotlyContextmenu data:',data);
+        let me = this;
+
+        /**
+        me.fire('plotlyCcontextmenu', {
+            id: me.id,
+            data
+        })
+        **/
+    }
+
+    parsePlotlyDoubleclick(data) {
+        console.log('PlotlyComponent parsePlotlyDoubleclick data:',data);
+        let me = this;
+
+        /**
+        me.fire('plotlyDoubleclick', {
+            id: me.id,
+            data
+        })
+        **/
+    }
+
+
+
+}
+
+Neo.applyClassConfig(PlotlyComponent);
+
+export default PlotlyComponent;

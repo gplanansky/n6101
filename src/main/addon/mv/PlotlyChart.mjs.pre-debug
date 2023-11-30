@@ -1,0 +1,142 @@
+import Base       from '../../core/Base.mjs';
+import DomAccess  from '../DomAccess.mjs';
+import DomEvents  from '../DomEvents.mjs';
+import Observable from '../../core/Observable.mjs';
+
+/**
+ * @class Neo.main.addon.PlotlyChart
+ * @extends Neo.core.Base
+ * @singleton
+ */
+class PlotlyChart extends Base {
+    static config = {
+        /**
+         * @member {String} className='Neo.main.addon.PlotlyChart'
+         * @protected
+         */
+        className: 'Neo.main.addon.PlotlyChart',
+        /**
+         * @member {Neo.core.Base[]} mixins=[Observable]
+         */
+        mixins: [Observable],  // required to have this.fire
+        apiLoaded: false,
+        automount: false,
+        chartCreated: false,
+        /**
+         * Remote method access for other workers
+         * @member {Object} remote={app: [//...]}
+         * @protected
+         */
+        remote: {
+            app: [
+                'create',
+                'sayPlotly'
+            ]
+        },
+        /**
+         * @member {String} plotlyPath='https://cdn.plot.ly/plotly-2.24.2.min.js'
+         * @protected
+         */
+        plotlyPath: 'https://cdn.plot.ly/plotly-2.24.2.min.js',
+        //plotlyPath: '../../node_modules/plotly.js-dist/plotly.js',
+        /**
+         * @member {Boolean} singleton=true
+         * @protected
+         */
+        singleton: true
+
+    }
+
+    charts ={}
+
+    /**
+     * @param {Object} config
+     */
+    construct(config) {
+        super.construct(config);
+        this.loadApi();
+    }
+
+    async loadApi() {
+        let me = this;
+        await DomAccess.loadScript(me.plotlyPath);
+        me.apiLoaded = true;
+        console.log(`${me.secondsStamp()} TIMER: addon/PlotlyCharts.mjs API loaded path ${me.plotlyPath}`);
+    }
+
+    /**
+     * plotly demo return
+     */
+     sayPlotly(){
+         return 'Plotly rocks!'
+     }
+
+    /**
+     * utility seconds:milliseconds
+     **/
+     secondsStamp(){
+        let date = new Date() ;
+        return `${date.getUTCSeconds()}:${date.getUTCMilliseconds()}`;
+     }
+
+
+
+    /**
+     * @param {Object} opts
+     * @param {String} opts.id
+     * @param {Object} opts.layout
+     * @param {Object} opts.data
+     */
+    create(opts) {
+        let me = this;
+
+        let id = opts.id;
+        
+        if ( ! me.apiLoaded ) {
+            setTimeout( () => {
+                console.log('addon/PlotlyChart.mjs YES setTimeout before Plotly.newPLot id: ', id);
+                me.doPlot(opts)
+            }, 500);
+        } else {
+            console.log('addon/PlotlyChart.mjs NO setTimeout before Plotly.newPLot id: ', id);
+            
+            me.doPlot(opts)
+        };
+    }
+
+    doPlot(opts) {
+
+        let me = this,
+        id = opts.id,
+        chart,
+        plot,
+        chartElement;
+
+        chartElement = DomAccess.getElement(id);
+  
+        console.log('addon/PlotlyChart.mjs opts: ', opts);
+        console.log('addon/PlotlyChart.mjs id : ', id);
+        console.log('addon/PlotlyChart.mjs chartElement:', chartElement);
+
+        (async () => {
+            chart = await Plotly.newPlot(id, opts);
+            console.log(`${me.secondsStamp()} TIMER: addon/PlotlyChart.mjs`);
+            console.log(`addon/PlotlyChart.mjs ASYNC ${id} create newPlot chart: `, chart);
+        })();
+
+        /**
+        Plotly.newPlot(id, opts).then( (chart) => {
+            console.log(`addon/PlotlyChart.mjs THEN ${id} create newPlot chart TIMER: ${new Date().toISOString()} ,  chart: `, chart);
+        });
+        **/
+
+        chartElement.on('plotly_click', (d) => console.log('on plotly_click: data:', d));
+        //me.fire('chartCreated', id);
+    }
+
+    //chartElement.innerHTML = 'Hello from PlotlyChart.mjs';
+}
+
+let instance = Neo.applyClassConfig(PlotlyChart);
+
+export default instance;

@@ -1,0 +1,106 @@
+import Base      from '../../core/Base.mjs';
+import DomAccess from '../DomAccess.mjs';
+
+/**
+ * @class Neo.main.addon.PlotlyChart
+ * @extends Neo.core.Base
+ * @singleton
+ */
+class PlotlyChart extends Base {
+    static config = {
+        /**
+         * @member {String} className='Neo.main.addon.PlotlyChart'
+         * @protected
+         */
+        className: 'Neo.main.addon.PlotlyChart',
+        /**
+         * Remote method access for other workers
+         * @member {Object} remote={app: [//...]}
+         * @protected
+         */
+        remote: {
+            app: [
+                'newPlot',
+                'sayPlotly'
+            ]
+        },
+        /**
+         * @member {String} plotlyPath='https://cdn.plot.ly/plotly-2.24.2.min.js'
+         * @protected
+         */
+        plotlyPath: 'https://cdn.plot.ly/plotly-2.24.2.min.js',
+        //plotlyPath: '../../node_modules/plotly.js-dist/plotly.js',
+        /**
+         * @member {Boolean} singleton=true
+         * @protected
+         */
+        singleton: true
+
+    }
+
+    charts ={}
+
+    /**
+     * @param {Object} config
+     */
+    construct(config) {
+        console.log('main.addon.PlotlyChart.mjs construct before loadScript using plotlyPath: ', this.plotlyPath);
+        super.construct(config);
+        DomAccess.loadScript(this.plotlyPath).then(() => {
+            console.log('main.addon.PlotlyChart.mjs construct loadscript promise chain: Plotly API loaded');
+        })
+
+    }
+
+    /**
+     * plotly demo return
+     */
+     sayPlotly(){
+         return 'Plotly rocks!'
+     }
+
+    /**
+     * @param {Object} config
+     * @param {String} config.chartdiv
+     * @param {Object} config.layout
+     * @param {Object} config.data
+     */
+    newPlot(config) {
+        let me = this;
+        let chartElement, id;
+        
+        console.log('PlotlyChart.mjs newPLot config : ', config);
+        
+        id = config.chartdiv
+        chartElement = DomAccess.getElement(id);
+
+
+        // Below 200 ms Plotly.newPlot yields error:
+        //    Uncaught ReferenceError: Plotly is not defined
+        setTimeout(() => {
+            console.log('PlotlyChart.mjs newPLot setTimeout ...');
+            let chart = Plotly.newPlot(id, config);
+            chartElement.on('plotly_click', (d) => console.log('on plotly_click: data:', d));
+            chartElement.on('plotly_contextmenu', (d) => console.log('on plotly_contextmenu: data:', d));
+            chartElement.on('plotly_doublclick', (d) => console.log('on plotly_dblclick: data:', d));
+            return chart
+        }, 250);
+    }
+
+    /*** todo 
+     Plotly.react
+     Plotly.restyle
+     Plotly.relayout
+     Plotly.update
+     Plotly.addTraces
+     Plotly.deleteTraces
+     Plotly.moveTraces
+     Plotly.extendTraces
+     Plotly.prependTraces
+   ***/
+
+}
+
+let instance = Neo.applyClassConfig(PlotlyChart);
+
+export default instance;
